@@ -69,7 +69,7 @@ function Notes({ pet }: Props) {
 
 function EmptyView() {
   return (
-    <p className="text-2xl font-medium h-full justify-center items-center">
+    <p className="h-full flex justify-center items-center text-2xl font-medium">
       No pet selected
     </p>
   );
