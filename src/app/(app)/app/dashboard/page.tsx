@@ -1,5 +1,6 @@
 import Branding from '@/app/components/branding';
 import ContentBlock from '@/app/components/content-bock';
+import PetButton from '@/app/components/pet-button';
 import PetDetails from '@/app/components/pet-details';
 import PetList from '@/app/components/pet-list';
 import SearchForm from '@/app/components/search-form';
@@ -17,9 +18,12 @@ export default async function DashBoardPage() {
           <SearchForm />
         </div>
 
-        <div className="md:row-start-2 md:row-span-full md:col-start-1 col-span-1">
+        <div className="relative md:row-start-2 md:row-span-full md:col-start-1 col-span-1">
           <ContentBlock>
             <PetList />
+            <div className="absolute bottom-4 right-4">
+              <PetButton actionType="add" />
+            </div>
           </ContentBlock>
         </div>
 
