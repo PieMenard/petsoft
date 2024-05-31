@@ -1,5 +1,5 @@
-import ContentBlock from '@/app/components/content-bock';
-import H1 from '@/app/components/h1';
+import ContentBlock from '@/components/content-bock';
+import H1 from '@/components/h1';
 
 export default function AccountPage() {
   return (

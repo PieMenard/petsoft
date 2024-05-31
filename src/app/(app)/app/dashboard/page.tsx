@@ -1,10 +1,10 @@
-import Branding from '@/app/components/branding';
-import ContentBlock from '@/app/components/content-bock';
-import PetButton from '@/app/components/pet-button';
-import PetDetails from '@/app/components/pet-details';
-import PetList from '@/app/components/pet-list';
-import SearchForm from '@/app/components/search-form';
-import Stats from '@/app/components/stats';
+import Branding from '@/components/branding';
+import ContentBlock from '@/components/content-bock';
+import PetButton from '@/components/pet-button';
+import PetDetails from '@/components/pet-details';
+import PetList from '@/components/pet-list';
+import SearchForm from '@/components/search-form';
+import Stats from '@/components/stats';
 
 export default async function DashBoardPage() {
   return (
