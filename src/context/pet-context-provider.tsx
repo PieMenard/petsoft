@@ -30,8 +30,22 @@ export default function PetContextProvider({
   //state
   const [optimisticPets, setOptimisticPets] = useOptimistic(
     data,
-    (state, newPet) => {
-      return [...state, { ...newPet, id: Math.random().toString() }];
+    (prev, { action, payload }) => {
+      switch (action) {
+        case 'add':
+          return [...prev, { ...payload, id: Math.random().toString() }];
+        case 'edit':
+          return prev.map((pet) => {
+            if (pet.id === payload.id) {
+              return { ...pet, ...payload.newPetData };
+            }
+            return pet;
+          });
+        case 'delete':
+          return prev.filter((pet) => pet.id !== payload);
+        default:
+          return prev;
+      }
     }
   );
   const [selectedPetId, setSelectedPetId] = useState<string | null>(null);
@@ -42,7 +56,7 @@ export default function PetContextProvider({
 
   //event handlers/actions
   const handleAddPet = async (newPet: Omit<Pet, 'id'>) => {
-    setOptimisticPets(newPet);
+    setOptimisticPets({ action: 'add', payload: newPet });
     const error = await addPet(newPet);
     if (error) {
       toast.warning(error.message);
@@ -50,6 +64,7 @@ export default function PetContextProvider({
     }
   };
   const handleEditPet = async (petId: string, newPetData: Omit<Pet, 'id'>) => {
+    setOptimisticPets({ action: 'edit', payload: { id: petId, newPetData } });
     const error = await editPet(petId, newPetData);
     if (error) {
       toast.warning(error.message);
@@ -57,7 +72,12 @@ export default function PetContextProvider({
     }
   };
   const handleCheckOutPet = async (petId: string) => {
-    await deletePet(petId);
+    setOptimisticPets({ action: 'delete', payload: petId });
+    const error = await deletePet(petId);
+    if (error) {
+      toast.warning(error.message);
+      return;
+    }
     setSelectedPetId(null);
   };
   const handleChangeSelectedPetId = (id: string) => {
