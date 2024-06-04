@@ -40,14 +40,14 @@ export default function PetContextProvider({
     await addPet(newPet);
   };
   const handleEditPet = (petId: string, newPetData: Omit<Pet, 'id'>) => {
-    setPets((prev) =>
-      prev.map((pet) => {
-        if (pet.id === petId) {
-          return { id: petId, ...newPetData };
-        }
-        return pet;
-      })
-    );
+    // setPets((prev) =>
+    //   prev.map((pet) => {
+    //     if (pet.id === petId) {
+    //       return { id: petId, ...newPetData };
+    //     }
+    //     return pet;
+    //   })
+    // );
   };
   const handleCheckOutPet = (id: string) => {
     setPets((prev) => prev.filter((pet) => pet.id !== id));
