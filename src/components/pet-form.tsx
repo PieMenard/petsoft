@@ -6,19 +6,30 @@ import { Label } from './ui/label';
 import { Textarea } from './ui/textarea';
 import PetFormBtn from './pet-form-btn';
 import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 
 type PetFormProps = {
   actionType: 'add' | 'edit';
   onFormSubmission: () => void;
 };
 
-type TPetForm = {
-  name: string;
-  ownerName: string;
-  imageUrl: string;
-  age: number;
-  notes: string;
-};
+const petFormSchema = z.object({
+  name: z.string().trim().min(1, { message: 'name is required' }).max(100),
+  ownerName: z
+    .string()
+    .trim()
+    .min(1, { message: 'Owner name is required' })
+    .max(100),
+  imageUrl: z.union([
+    z.literal(''),
+    z.string().trim().url({ message: 'Image url must be a valid url' }),
+  ]),
+  age: z.coerce.number().int().positive().max(99999),
+  notes: z.union([z.literal(''), z.string().trim().max(1000)]),
+});
+
+type TPetForm = z.infer<typeof petFormSchema>;
 
 export default function PetForm({
   actionType,
@@ -28,12 +39,17 @@ export default function PetForm({
 
   const {
     register,
+    trigger,
     formState: { errors },
-  } = useForm<TPetForm>();
+  } = useForm<TPetForm>({
+    resolver: zodResolver(petFormSchema),
+  });
 
   return (
     <form
       action={async (formData) => {
+        const result = await trigger();
+        if (!result) return;
         onFormSubmission();
 
         const petData = {
@@ -79,14 +95,15 @@ export default function PetForm({
         <div className="space-y-1">
           <Label htmlFor="age">Age</Label>
           <Input id="age" {...register('age')} />
-          {errors.notes && (
-            <p className="text-red-500">{errors.notes.message}</p>
-          )}
+          {errors.age && <p className="text-red-500">{errors.age.message}</p>}
         </div>
 
         <div className="space-y-1">
           <Label htmlFor="notes">Notes</Label>
           <Textarea id="notes" rows={3} {...register('notes')} />
+          {errors.notes && (
+            <p className="text-red-500">{errors.notes.message}</p>
+          )}
         </div>
       </div>
       <PetFormBtn actionType={actionType} />
