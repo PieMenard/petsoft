@@ -1,9 +1,10 @@
 'use server';
 
-import { signIn } from '@/lib/auth';
+import { signIn, signOut } from '@/lib/auth';
 import prisma from '@/lib/db';
 import { sleep } from '@/lib/utils';
 import { petFormSchema, petIdSchema } from '@/lib/validations';
+
 import { revalidatePath } from 'next/cache';
 
 ///---user actions---
@@ -11,6 +12,10 @@ export async function logIn(formData: FormData) {
   const authDdata = Object.fromEntries(formData.entries())
 
   await signIn('credentials', authDdata);
+}
+
+export async function logOut() {
+  await signOut({ redirectTo: "/" });
 }
 
 //--- pet actions ---
