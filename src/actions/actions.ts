@@ -1,24 +1,26 @@
-
 'use server';
 
-import { signIn, signOut } from '@/lib/auth';
+import { auth, signIn, signOut } from '@/lib/auth';
 import prisma from '@/lib/db';
 import { sleep } from '@/lib/utils';
 import { petFormSchema, petIdSchema } from '@/lib/validations';
 import bcrypt from 'bcryptjs';
 import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
 
 ///---user actions---
 export async function signUp(formData: FormData) {
-
-  const hashedPassword = await bcrypt.hash(formData.get("password") as string, 10);
+  const hashedPassword = await bcrypt.hash(
+    formData.get('password') as string,
+    10
+  );
 
   await prisma.user.create({
     data: {
-      email: formData.get("email") as string,
+      email: formData.get('email') as string,
       hashedPassword,
-    }
-  })
+    },
+  });
 
   await signIn('credentials', formData);
 }
@@ -27,23 +29,36 @@ export async function logIn(formData: FormData) {
 }
 
 export async function logOut() {
-  await signOut({ redirectTo: "/" });
+  await signOut({ redirectTo: '/' });
 }
 
 //--- pet actions ---
 export async function addPet(pet: unknown) {
   await sleep(1000);
 
+  //check if user is logged in and get their id
+  const session = await auth();
+  if (!session?.user) {
+    redirect('/login');
+  }
+
   const validatedPet = petFormSchema.safeParse(pet);
   if (!validatedPet.success) {
     return {
-      message: "Invalid pet data."
-    }
+      message: 'Invalid pet data.',
+    };
   }
 
   try {
     await prisma.pet.create({
-      data: validatedPet.data,
+      data: {
+        ...validatedPet.data,
+        user: {
+          connect: {
+            id: session.user.id,
+          },
+        },
+      },
     });
   } catch (error) {
     return {
@@ -62,8 +77,8 @@ export async function editPet(petId: unknown, newPet: unknown) {
 
   if (!validatedPet.success || !validatedPetId.success) {
     return {
-      message: "Invalid pet data."
-    }
+      message: 'Invalid pet data.',
+    };
   }
 
   try {
@@ -89,8 +104,8 @@ export async function deletePet(petId: unknown) {
 
   if (!validatedPetId.success) {
     return {
-      message: "Invalid pet data."
-    }
+      message: 'Invalid pet data.',
+    };
   }
 
   try {
