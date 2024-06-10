@@ -8,6 +8,7 @@ import { authSchema, petFormSchema, petIdSchema } from '@/lib/validations';
 import bcrypt from 'bcryptjs';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+import { Form } from 'react-hook-form';
 
 ///---user actions---
 export async function logIn(formData: unknown) {
@@ -21,16 +22,30 @@ export async function logIn(formData: unknown) {
   redirect("/app/dashboard");
 }
 
-export async function signUp(formData: FormData) {
+export async function signUp(formData: unknown) {
+  //check if formData is a FormData type
+  if (!(formData instanceof FormData)) {
+    return {
+      message: "Invalid form data."
+    };
+  }
 
-  const hashedPassword = await bcrypt.hash(
-    formData.get('password') as string,
-    10
-  );
+  //convert formData to a plain object
+  const formDataEntries = Object.fromEntries(formData.entries());
 
+  //validation
+  const valitedFormData = authSchema.safeParse(formDataEntries)
+  if (!valitedFormData.success) {
+    return {
+      message: "Invalid form data."
+    }
+  }
+
+  const { email, password } = valitedFormData.data;
+  const hashedPassword = await bcrypt.hash(password, 10);
   await prisma.user.create({
     data: {
-      email: formData.get('email') as string,
+      email,
       hashedPassword,
     },
   });
