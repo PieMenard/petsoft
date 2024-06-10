@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { DEFAULT_PET_IMAGE } from "./constants";
+import email from "next-auth/providers/email";
 
 export const petIdSchema = z.string().cuid();
 
@@ -24,3 +25,10 @@ export const petFormSchema = z
     }));
 
 export type TPetForm = z.infer<typeof petFormSchema>;
+
+export const authSchema = z.object({
+    email: z.string().email().max(100),
+    password: z.string().max(100)
+})
+
+export type TAuth = z.infer<typeof authSchema>;
