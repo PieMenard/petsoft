@@ -11,6 +11,8 @@ import { AuthError } from 'next-auth';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+
 ///---user actions---
 export async function logIn(prevState: unknown, formData: unknown) {
   await sleep(1000);
@@ -211,4 +213,26 @@ export async function deletePet(petId: unknown) {
   }
 
   revalidatePath('/app', 'layout');
+}
+
+// --- payment actions ---
+
+export async function createCheckoutSession() {
+
+  //authenticaion check
+  const session = await checkAuth();
+
+  const checkoutSession = await stripe.checkout.sessions.create({
+    customer_email: session.user.email,
+    line_items: [{
+      price: "price_1PQWKKB8fMt9iZ05vrvyQCoq",
+      quantity: 1
+    }],
+    mode: "payment",
+    success_url: `${process.env.BASE_URL}/payment?success=true`,
+    cancel_url: `${process.env.BASE_URL}/payment?cancelled=true`,
+  })
+
+  //redirect user
+  redirect(checkoutSession.url);
 }
