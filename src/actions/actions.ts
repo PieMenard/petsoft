@@ -20,6 +20,7 @@ export async function logIn(prevState: unknown, formData: unknown) {
       message: 'Invalid form data.',
     };
   }
+
   try {
     await signIn('credentials', formData);
   } catch (error) {
@@ -36,12 +37,8 @@ export async function logIn(prevState: unknown, formData: unknown) {
           };
       }
     }
-    return {
-      message: 'Could not sign in.',
-    };
+    throw error; //nextjs redirects throw error, so we need to rethrow it
   }
-
-  redirect('/app/dashboard');
 }
 
 export async function signUp(prevState: unknown, formData: unknown) {
