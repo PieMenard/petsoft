@@ -2,7 +2,7 @@ import { User } from "next-auth"
 
 declare module "next-auth" {
     interface User {
-        hasAccess: bolean,
+        hasAccess: boolean,
         email: string
     }
     interface Session {

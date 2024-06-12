@@ -90,7 +90,7 @@ const config = {
         //on every request
         const userFromDb = await getUserByEmail(token.email);
         if (userFromDb) {
-          token.hassAccess = userFromDb.hasAccess;
+          token.hasAccess = userFromDb.hasAccess;
         }
       }
 

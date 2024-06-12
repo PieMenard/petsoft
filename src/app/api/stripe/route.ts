@@ -5,7 +5,7 @@ export async function POST(request: Request) {
     //verify webhook came from Stripe
 
     //fullfill order
-    prisma.user.update({
+    await prisma.user.update({
         where: {
             email: data.data.object.customer_email,
         },
