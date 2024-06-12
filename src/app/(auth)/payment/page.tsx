@@ -5,7 +5,7 @@ import H1 from '@/components/h1';
 import { Button } from '@/components/ui/button';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { startTransition, useEffect, useTransition } from 'react';
+import { useTransition } from 'react';
 
 export default function PaymentPage({
   searchParams,
@@ -13,7 +13,7 @@ export default function PaymentPage({
   searchParams: { [key: string]: string | string[] | undefined };
 }) {
   const [isPending, startTransition] = useTransition();
-  const { update } = useSession();
+  const { data: session, update, status } = useSession();
   const router = useRouter();
 
   return (
@@ -22,6 +22,7 @@ export default function PaymentPage({
 
       {searchParams.success && (
         <Button
+          disabled={status === 'loading' || session?.user.hasAccess}
           onClick={async () => {
             await update(true);
             router.push('/app/dashboard');
