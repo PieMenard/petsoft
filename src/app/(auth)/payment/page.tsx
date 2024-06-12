@@ -7,7 +7,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useTransition } from 'react';
 
-export default function PaymentPage({
+export default function Page({
   searchParams,
 }: {
   searchParams: { [key: string]: string | string[] | undefined };
@@ -22,11 +22,11 @@ export default function PaymentPage({
 
       {searchParams.success && (
         <Button
-          disabled={status === 'loading' || session?.user.hasAccess}
           onClick={async () => {
             await update(true);
             router.push('/app/dashboard');
           }}
+          disabled={status === 'loading' || session?.user.hasAccess}
         >
           Access PetSoft
         </Button>
@@ -41,17 +41,19 @@ export default function PaymentPage({
             });
           }}
         >
-          Buy lifetime access for $199
+          Buy lifetime access for $299
         </Button>
       )}
 
       {searchParams.success && (
-        <p className="text-sm text-green-700">
+        <p className="text-sm text-green-600">
           Payment successful! You now have lifetime access to PetSoft.
         </p>
       )}
       {searchParams.cancelled && (
-        <p className="text-sm text-green-700">Payment cancelled. Try again.</p>
+        <p className="text-sm text-red-700">
+          Payment cancelled. You can try again.
+        </p>
       )}
     </main>
   );
